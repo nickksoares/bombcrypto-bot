@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-    
 from cv2 import cv2
-import simpleaudio
+#import simpleaudio
+import winsound
 
 
 from os import listdir
-from src.logger import logger, loggerMapClicked
+#from src.logger import logger, loggerMapClicked
 from random import randint
 from random import random
 
@@ -13,42 +14,57 @@ import mss
 import pyautogui
 import time
 import sys
+import telegram
 
 import yaml
 
 
-cat = """
-                                                _
-                                                \`*-.
-                                                 )  _`-.
-                                                .  : `. .
-                                                : _   '  \\
-                                                ; *` _.   `*-._
-                                                `-.-'          `-.
-                                                  ;       `       `.
-                                                  :.       .        \\
-                                                  . \  .   :   .-'   .
-                                                  '  `+.;  ;  '      :
-                                                  :  '  |    ;       ;-.
-                                                  ; '   : :`-:     _.`* ;
-                                               .*' /  .*' ; .*`- +'  `*'
-                                               `*-*   `*-*  `*-*'
+import requests
+import telepot
+import os
+
+import pytesseract as ocr
+from PIL import Image
+
+def logger(message, progress_indicator = False, color = 'default'):
+    return
+
+def loggerMapClicked():
+    return
+TELEGRAM_BOT_TOKEN = '5054843344:AAFwkjL9X2sptxWg03uw8WiW_EtxiK__Y9s'
+TELEGRAM_CHAT_ID = '1098462734'
+PHOTO_PATH = 'C:\bomb\saldo1.png'
+bot = telegram.Bot(token=TELEGRAM_BOT_TOKEN)
+
+
+def telegram_bot_sendtext(bot_message):
+    bot_token = '5054843344:AAFwkjL9X2sptxWg03uw8WiW_EtxiK__Y9s'
+    bot_chatID = '1098462734'
+    send_text = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + bot_chatID + '&parse_mode=Markdown&text=' + bot_message
+    response = requests.get(send_text)
+    return response.json()
+	
+
+
+mendigo = """
+
 =========================================================================
-================ Please, consider buying me an coffe :) =================
+================     Se quiser me dar um trocado :)     =================
 =========================================================================
-============== 0xbd06182D8360FB7AC1B05e871e56c76372510dDf ===============
-===== https://www.paypal.com/donate?hosted_button_id=JVYSC6ZYCNQQQ ======
+============== 0x4846d02469dbABEE411f641dAb775E6dd6077C6b ===============
+=====                                                              ======
 =========================================================================
 
->>---> Press ctrl + c to kill the bot.
+>>---> Aperte Ctrl+C para fazer o BOT PARAR.
+>>---> V 0.9.8 (Beta).
+"""
 
->>---> Some configs can be fount in the config.yaml file."""
+print(mendigo)
+test = telegram_bot_sendtext("🔌 Bot inicializado. \n\n 💰 É hora de faturar alguns BCoins!!!")
 
 
-print(cat)
 
-
-bell_sound = simpleaudio.WaveObject.from_wave_file("bell.wav")
+#bell_sound = simpleaudio.WaveObject.from_wave_file("bell.wav")
 
 
 if __name__ == '__main__':
@@ -68,6 +84,7 @@ pyautogui.FAILSAFE = False
 hero_clicks = 0
 login_attempts = 0
 last_log_is_progress = False
+saldo_atual = 0.0
 
 
 
@@ -117,24 +134,26 @@ def loadHeroesToSendHome():
 if ch['enable']:
     home_heroes = loadHeroesToSendHome()
 
-# go_work_img = cv2.imread('targets/go-work.png')
-# commom_img = cv2.imread('targets/commom-text.png')
-# arrow_img = cv2.imread('targets/go-back-arrow.png')
-# hero_img = cv2.imread('targets/hero-icon.png')
-# x_button_img = cv2.imread('targets/x.png')
-# teasureHunt_icon_img = cv2.imread('targets/treasure-hunt-icon.png')
-# ok_btn_img = cv2.imread('targets/ok.png')
-# connect_wallet_btn_img = cv2.imread('targets/connect-wallet.png')
-# select_wallet_hover_img = cv2.imread('targets/select-wallet-1-hover.png')
-# select_metamask_no_hover_img = cv2.imread('targets/select-wallet-1-no-hover.png')
-# sign_btn_img = cv2.imread('targets/select-wallet-2.png')
-# new_map_btn_img = cv2.imread('targets/new-map.png')
-# green_bar = cv2.imread('targets/green-bar.png')
+go_work_img = cv2.imread('targets/go-work.png')
+commom_img = cv2.imread('targets/commom-text.png')
+arrow_img = cv2.imread('targets/go-back-arrow.png')
+hero_img = cv2.imread('targets/hero-icon.png')
+x_button_img = cv2.imread('targets/x.png')
+teasureHunt_icon_img = cv2.imread('targets/treasure-hunt-icon.png')
+ok_btn_img = cv2.imread('targets/ok.png')
+connect_wallet_btn_img = cv2.imread('targets/connect-wallet.png')
+select_wallet_hover_img = cv2.imread('targets/select-wallet-1-hover.png')
+select_metamask_no_hover_img = cv2.imread('targets/select-wallet-1-no-hover.png')
+sign_btn_img = cv2.imread('targets/select-wallet-2.png')
+new_map_btn_img = cv2.imread('targets/new-map.png')
+green_bar = cv2.imread('targets/green-bar.png')
 full_stamina = cv2.imread('targets/full-stamina.png')
 puzzle_img = cv2.imread('targets/puzzle.png')
 piece = cv2.imread('targets/piece.png')
 robot = cv2.imread('targets/robot.png')
 slider = cv2.imread('targets/slider.png')
+bcoin_logo = cv2.imread('targets/bcoin-logo.png')
+consultar_saldo = cv2.imread('targets/consultar-saldo.png')
 
 def findPuzzlePieces(result, piece_img, threshold=0.5):
     piece_w = piece_img.shape[1]
@@ -267,9 +286,10 @@ def alertCaptcha():
 
     if len(popup_pos) == 0:
         return "not-found"
-
+    test = telegram_bot_sendtext("⚠️ ATENÇÃO! \n\n 🧩 RESOLVER NOVO CAPTCHA!")
     logger('captcha!')
-    bell_sound.play()
+    #bell_sound.play()
+    winsound.PlaySound ('bell.wav', winsound .SND_ASYNC);
 
     i=0
     while True:
@@ -459,11 +479,14 @@ def clickGreenBarButtons():
         pyautogui.click()
         global hero_clicks
         hero_clicks = hero_clicks + 1
+
         if hero_clicks > 20:
             logger('⚠️ Too many hero clicks, try to increase the go_to_work_btn threshold')
             return
         #cv2.rectangle(sct_img, (x, y) , (x + w, y + h), (0,255,255),2)
     return len(not_working_green_bars)
+
+   
 
 def clickFullBarButtons():
     offset = 100
@@ -505,6 +528,22 @@ def goToGame():
     clickBtn(images['x'])
 
     clickBtn(images['treasure-hunt-icon'])
+
+def goSaldo():
+    global saldo_atual
+    # in case of server overload popup
+    clickBtn(images['x'])
+    time.sleep(3)
+    clickBtn(images['x'])
+
+    clickBtn(consultar_saldo)
+    test = telegram_bot_sendtext("Saldo de BCoins atualizado:")
+    time.sleep(25)
+    myScreen = pyautogui.screenshot(region=(465, 435, 150, 150))
+    myScreen.save(r'C:\bomb\saldo1.png')
+
+    clickBtn(images['x'])
+
 
 def refreshHeroesPositions():
 
@@ -648,6 +687,7 @@ def main():
     last = {
     "login" : 0,
     "heroes" : 0,
+    "ssaldo" :0,
     "new_map" : 0,
     "check_for_captcha" : 0,
     "refresh_heroes" : 0
@@ -660,6 +700,7 @@ def main():
             last["check_for_captcha"] = now
             alertCaptcha()
 
+  
         if now - last["heroes"] > addRandomness(t['send_heroes_for_work'] * 60):
             last["heroes"] = now
             refreshHeroes()
@@ -675,6 +716,10 @@ def main():
             if clickBtn(images['new-map']):
                 loggerMapClicked()
 
+        if now - last["ssaldo"] > addRandomness(t['get_saldo'] * 60):
+            last["ssaldo"] = now
+            goSaldo()
+
 
         if now - last["refresh_heroes"] > addRandomness( t['refresh_heroes_positions'] * 60):
             alertCaptcha()
@@ -687,16 +732,7 @@ def main():
         sys.stdout.flush()
 
         time.sleep(1)
-
-def solveNewCaptcha(t=150):
-    img = images['nc']
-    edges = cv2.Canny(img, threshold1=t/2, threshold2=t,L2gradient=True)
-    cv2.imshow('img',edges)
-    cv2.waitKey(0)
-solveNewCaptcha()
-
-
-# main()
+main()
 # sendHeroesHome()
 
 
